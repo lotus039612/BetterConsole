@@ -1570,7 +1570,7 @@ function M.create_defaults()
         },
         custom_filter_presets = {},
         current_custom_preset = DEFAULT_CUSTOM_PRESET_INDEX,
-        show_metadata_panel = false,
+        show_metadata_panel = true,
         metadata_panel = {
             width_ratio = DEFAULT_METADATA_PANEL_WIDTH_RATIO
         }

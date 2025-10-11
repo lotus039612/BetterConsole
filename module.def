@@ -1,7 +1,7 @@
 [Module]
 Name=BetterConsole
-Author=
-Version=1.0
+Author=LOTUS
+Version=1
 Dependencies=minionlib
 Files=src/private_env.lua,src/core.lua,src/domain.lua,src/infrastructure.lua,src/adapters.lua,src/integration.lua,src/ui_components.lua,src/ui.lua,src/application.lua,init.lua
 CreateFolders=logs

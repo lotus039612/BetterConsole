@@ -116,7 +116,7 @@ function M.render_window_chrome(self, should_be_open, callback)
     local ErrorHandler = BetterConsole.ErrorHandler
     local success, err = ErrorHandler.try_catch(function()
         local window_open
-        self.is_visible, window_open = GUI:Begin("Lotus##BetterConsole", should_be_open, self.window_flags)
+        self.is_visible, window_open = GUI:Begin("BetterConsole##BetterConsole", should_be_open, self.window_flags)
 
         if not window_open and should_be_open then
             self.is_visible = false

@@ -60,7 +60,7 @@ M.render = function(window)
                 window.export_manager:initialize_auto_save(window.display.auto_save_logs)
                 BetterConsole.Prefs.save_user_prefs(window)
             end
-            TooltipManager.show_warning("Automatically save logs to file on each entry.\n_performance intensive")
+            TooltipManager.show_warning("Automatically save logs to file on each entry.\n**performance intensive")
 
             GUI:Separator()
             local anti_spam_label = create_menu_label(window.anti_spam.enabled, "Anti-Spam Filter")
@@ -330,9 +330,9 @@ local function render_level_chips(window, enabled_levels)
 
         if TooltipManager.should_show() then
             if #enabled_levels == SINGLE_LEVEL_COUNT then
-                TooltipManager.show("Click to clear level filter\n_right-click to exclude " .. level .. " level")
+                TooltipManager.show("Click to clear level filter\nright-click to exclude " .. level .. " level")
             else
-                TooltipManager.show("Click to remove " .. level .. " from filter\n_right-click to exclude " .. level .. " level")
+                TooltipManager.show("Click to remove " .. level .. " from filter\nright-click to exclude " .. level .. " level")
             end
         end
 
@@ -357,7 +357,7 @@ local function render_category_chips(window, enabled_categories)
             apply_filter_change(window, false)
         end
 
-        TooltipManager.show_on_hover("Click to remove " .. cat .. " category filter\n_right-click to exclude " .. cat .. " category")
+        TooltipManager.show_on_hover("Click to remove " .. cat .. " category filter\nright-click to exclude " .. cat .. " category")
         GUI:SameLine()
     end
 end
@@ -379,7 +379,7 @@ local function render_excluded_level_chips(window, excluded_levels)
             apply_filter_change(window, true)
         end
 
-        TooltipManager.show_on_hover("Click to remove " .. level .. " level exclusion\n_right-click to enable only " .. level .. " level")
+        TooltipManager.show_on_hover("Click to remove " .. level .. " level exclusion\nright-click to enable only " .. level .. " level")
         GUI:SameLine()
     end
 end
@@ -401,7 +401,7 @@ local function render_excluded_category_chips(window, excluded_categories)
             apply_filter_change(window, false)
         end
 
-        TooltipManager.show_on_hover("Click to remove " .. cat .. " category exclusion\n_right-click to filter only " .. cat .. " category")
+        TooltipManager.show_on_hover("Click to remove " .. cat .. " category exclusion\nright-click to filter only " .. cat .. " category")
         GUI:SameLine()
     end
 end
@@ -1282,11 +1282,11 @@ local function render_selectable_filter(label, is_included, is_excluded, tooltip
 
     if TooltipManager.should_show() then
         if is_excluded then
-            TooltipManager.show(tooltip .. "\n_left-click to include\n_right-click to clear exclusion")
+            TooltipManager.show(tooltip .. "\nleft-click to include\nright-click to clear exclusion")
         elseif is_included then
-            TooltipManager.show(tooltip .. "\n_left-click to clear include\n_right-click to exclude")
+            TooltipManager.show(tooltip .. "\nleft-click to clear include\nright-click to exclude")
         else
-            TooltipManager.show(tooltip .. "\n_left-click to include\n_right-click to exclude")
+            TooltipManager.show(tooltip .. "\nleft-click to include\nright-click to exclude")
         end
     end
 
@@ -1801,6 +1801,22 @@ local function render_value_colored(value, indent, visited, depth, max_depth)
                 items[#items + 1] = { key = k, value = v }
             end
 
+            -- Sort items for consistent display order
+            table.sort(items, function(a, b)
+                local ta, tb = type(a.key), type(b.key)
+                if ta ~= tb then
+                    -- Numbers before strings before other types
+                    if ta == "number" then return true end
+                    if tb == "number" then return false end
+                    if ta == "string" then return true end
+                    if tb == "string" then return false end
+                end
+                if ta == "number" or ta == "string" then
+                    return a.key < b.key
+                end
+                return tostring(a.key) < tostring(b.key)
+            end)
+
             local n = #items
             if n <= 3 and depth > 0 then
                 text_colored(COLORS.TABLE_BRACE, indent .. "{ ")
@@ -1949,7 +1965,28 @@ M.render = function(window, width, height)
                 text_colored({ 0.7, 0.7, 0.7, 1.0 }, "Metadata:")
                 GUI:Spacing()
 
-                for k, v in pairs(entry.data) do
+                -- Collect and sort keys for consistent display order
+                local sorted_keys = {}
+                for k in pairs(entry.data) do
+                    sorted_keys[#sorted_keys + 1] = k
+                end
+                table.sort(sorted_keys, function(a, b)
+                    local ta, tb = type(a), type(b)
+                    if ta ~= tb then
+                        -- Numbers before strings before other types
+                        if ta == "number" then return true end
+                        if tb == "number" then return false end
+                        if ta == "string" then return true end
+                        if tb == "string" then return false end
+                    end
+                    if ta == "number" or ta == "string" then
+                        return a < b
+                    end
+                    return tostring(a) < tostring(b)
+                end)
+
+                for _, k in ipairs(sorted_keys) do
+                    local v = entry.data[k]
                     text_colored(COLORS.KEY, "  " .. tostring(k) .. ":")
                     render_value_colored(v, "    ", {}, 0, 5)
                     GUI:Spacing()

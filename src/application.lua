@@ -237,7 +237,7 @@ function M.new()
 
         virtual_scroll = BetterConsole.VirtualScroll.create(),
 
-        show_metadata_panel = false,
+        show_metadata_panel = true,
         selected_entry_for_metadata = nil,
         metadata_panel = {
             width_ratio = 0.30,
