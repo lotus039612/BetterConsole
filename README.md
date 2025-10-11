@@ -96,8 +96,8 @@ You can attach structured data to your log entries for easier debugging and insp
 ```lua
 -- Basic log with metadata
 d("Player position updated", {
-    x = player.pos.x,
     y = player.pos.y,
+    x = player.pos.x,
     map_id = player.localmapid -- intentional. we preserve table order
     z = player.pos.z,
 })
