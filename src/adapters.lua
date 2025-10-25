@@ -3,12 +3,10 @@
 -- Note: FFXIV Minion is Windows-only, so paths are hardcoded for Windows
 local Adapters = {}
 
--- Initialize global BetterConsole namespace if not present
 if not BetterConsole then
     BetterConsole = {}
 end
 
--- Extract constants and configuration from existing modules
 local Models = BetterConsole and BetterConsole.Models
 local Constants = Models and Models.Constants
 local TimeConstants = Constants and Constants.Time
@@ -16,7 +14,6 @@ local FiltersConstants = Constants and Constants.Filters
 local GeneralConstants = Constants and Constants.General
 local Private = BetterConsole and BetterConsole.Private or {}
 
--- Windows path handling (FFXIV Minion is Windows-only)
 local PATH_SEPARATOR = (Private and Private.separator) or "\\"
 local ALT_SEPARATOR = "/"
 local MODULE_NAME = (Private and Private.module_name) or "BetterConsole"
@@ -32,9 +29,7 @@ local function normalize_path(path)
         return nil
     end
 
-    -- Convert forward slashes to backslashes
     path = path:gsub(ALT_SEPARATOR, PATH_SEPARATOR)
-    -- Remove duplicate separators
     path = path:gsub(PATH_SEPARATOR .. "+", PATH_SEPARATOR)
     return path
 end
@@ -133,7 +128,6 @@ local function resolve_prefs_file()
     return nil
 end
 
--- Constants for serialization, clipboard operations, and file handling
 local CLIPBOARD_TRUNCATION_SUFFIX = "... [TRUNCATED]"
 local DEFAULT_METADATA_MAX_DEPTH = 5
 local SERIALIZE_INDENT_STEP = "  "
@@ -145,12 +139,10 @@ local SERIALIZE_SIMPLE_TYPES = {
     boolean = true
 }
 
--- Time and formatting constants
 local MS_PER_SECOND = (TimeConstants and TimeConstants.MS_PER_SECOND) or 1000
 local DEFAULT_METADATA_PANEL_WIDTH_RATIO = 0.30
 local FIRST_INDEX = (GeneralConstants and GeneralConstants.FIRST_INDEX) or 1
 
--- File repository and serialization constants
 local MIN_SERIALIZED_LINE_PARTS = 4
 local RING_BUFFER_INDEX_BIAS = 2
 local SERIALIZED_LINE_TIMESTAMP_INDEX = 1
@@ -160,7 +152,6 @@ local SERIALIZED_LINE_MESSAGE_INDEX = 4
 local SERIALIZED_LINE_DATA_INDEX = 5
 local SERIALIZED_LINE_TEMPLATE = "%d|%s|%s|%s|%s\n"
 
--- Export and logging configuration
 local DEFAULT_EXPORTER_NAME = "text"
 local LOG_FILENAME_PREFIX = "console_"
 local LOG_FILENAME_EXTENSION = ".log"
@@ -172,7 +163,6 @@ local TEXT_TIMESTAMP_FORMAT = CLOCK_DATE_TIME_FORMAT
 local AUTOSAVE_LOG_PREFIX = "BetterConsole_log_"
 local LOG_SESSION_HEADER_PREFIX = "-- BetterConsole Log Session Started at "
 
--- Repository performance tuning constants
 local FILE_REPOSITORY_DEFAULT_CACHE_SIZE = 1000
 local FILE_REPOSITORY_INDEX_SAVE_INTERVAL = 100
 local FILE_REPOSITORY_INDEX_SUFFIX = ".index"
@@ -180,11 +170,9 @@ local FILE_REPOSITORY_FLUSH_THRESHOLD = 20
 local FILE_REPOSITORY_FLUSH_INTERVAL_MS = 250
 local MEMORY_REPOSITORY_DEFAULT_CAPACITY = 50000
 
--- Filter and query constants
 local DEFAULT_CUSTOM_PRESET_INDEX = (FiltersConstants and FiltersConstants.DEFAULT_CUSTOM_PRESET_INDEX) or 0
 local QUERY_UNBOUNDED_LIMIT = math.huge
 
--- Preference field mappings for serialization
 local PREFERENCE_DISPLAY_FIELDS = { "timestamp", "level", "category", "metadata", "auto_save_logs" }
 local PREFERENCE_SEARCH_FIELDS = { "case_sensitive" }
 local PREFERENCE_METADATA_PANEL_FIELDS = { "width_ratio" }
@@ -274,7 +262,6 @@ local function shallow_assign(target, key, source_value)
     end
 end
 
--- Field names for filter list preferences
 local PREFERENCE_FILTER_LIST_FIELDS = {
     "categories",
     "exclude_categories",
@@ -367,8 +354,6 @@ local function query_entries(iterator_wrapper, options)
     return results
 end
 
--- Clipboard and serialization utilities module
--- Provides text copying, metadata serialization, and circular reference handling
 do
 local M = {}
 
@@ -516,15 +501,12 @@ function M.serialize_metadata(data, max_depth)
     return serialize_value(data, "", {}, 0, effective_max_depth)
 end
 
--- Export clipboard utilities to global namespace
 BetterConsole.Clipboard = M
 if BetterConsole.ClipboardHelper == nil then
     BetterConsole.ClipboardHelper = M
 end
 end
 
--- Time and date utilities module
--- Provides timestamp formatting, elapsed time calculation, and timeout checking
 do
 local M = {}
 
@@ -589,12 +571,9 @@ function M.has_expired(start_ms, timeout_ms)
     return M.elapsed_ms(start_ms) >= timeout_ms
 end
 
--- Export clock utilities to global namespace
 BetterConsole.Clock = M
 end
 
--- Log export and file management module
--- Handles exporting log entries to clipboard and files with multiple format support
 do
 local M = {}
 
@@ -771,7 +750,6 @@ function M:append_log_entry(entry)
     file:close()
 end
 
--- Text exporter implementation for plain text format
 M.TextExporter = {}
 
 -- Creates new text exporter instance
@@ -865,12 +843,9 @@ function M.TextExporter:format_entry(entry)
     return table.concat(parts, " ")
 end
 
--- Export exporter module to global namespace
 BetterConsole.Exporter = M
 end
 
--- File-based log repository with caching and batched writes
--- Implements persistent storage with performance optimizations and indexing
 do
 local RepositoryInterface = BetterConsole.RepositoryInterface
 local Models = BetterConsole.Models
@@ -948,8 +923,6 @@ function M.new(file_path, cache_size)
     return instance
 end
 
--- Initializes repository by opening file handle and loading recent entries
--- Sets up index tracking and populates cache with recent log entries
 function M:initialize()
     seed_total_added(self)
 
@@ -963,8 +936,6 @@ function M:initialize()
     self:load_recent_entries()
 end
 
--- Loads recent log entries from file into memory cache
--- Reads entire file and keeps most recent entries up to cache size limit
 function M:load_recent_entries()
     local file = io.open(self.file_path, "r")
     if not file then
@@ -1325,8 +1296,6 @@ function M:get_total_added()
     return self.total_added
 end
 
--- Closes repository and ensures all pending writes are flushed
--- Marks index as dirty, flushes all pending data, and closes file handle
 function M:close()
     if self.file_handle then
         self.index_dirty = true
@@ -1336,12 +1305,9 @@ function M:close()
     end
 end
 
--- Export file repository to global namespace
 BetterConsole.FileRepository = M
 end
 
--- Memory-based log repository using ring buffer for fast access
--- Provides in-memory storage with configurable capacity and circular buffer behavior
 do
 local RingBuffer = BetterConsole.RingBuffer
 local RepositoryInterface = BetterConsole.RepositoryInterface
@@ -1680,9 +1646,7 @@ function M.extract_from_window(window)
     return prefs
 end
 
--- Export preferences module to global namespace
 BetterConsole.Prefs = M
 end
 
--- Export adapters module containing all utility implementations
 return Adapters

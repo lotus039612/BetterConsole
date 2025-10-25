@@ -214,40 +214,16 @@ function M.ExecuteCodeCommand:execute(context)
     context:add_entry("INFO", "Console", "Code: " .. command)
 
     local sandbox = create_sandbox()
-    local lua_version = _VERSION or ""
     local func
     local load_err
 
-    if lua_version ~= "Lua 5.1" and type(load) == "function" then
-        func, load_err = load(command, "BetterConsoleCommand", "t", sandbox)
-    end
-
-    if not func and type(loadstring) == "function" then
+    if type(loadstring) == "function" then
         func, load_err = loadstring(command)
-        if func then
-            if type(setfenv) == "function" then
-                setfenv(func, sandbox)
-            elseif type(debug) == "table" and type(debug.getupvalue) == "function" and type(debug.setupvalue) == "function" then
-                local upvalue_name = debug.getupvalue(func, 1)
-                if upvalue_name == "_ENV" then
-                    debug.setupvalue(func, 1, sandbox)
-                end
-            end
+        if func and type(setfenv) == "function" then
+            setfenv(func, sandbox)
         end
-    end
-
-    if not func and type(load) == "function" then
-        func, load_err = load(command, "BetterConsoleCommand")
-        if func then
-            if type(setfenv) == "function" then
-                setfenv(func, sandbox)
-            elseif type(debug) == "table" and type(debug.getupvalue) == "function" and type(debug.setupvalue) == "function" then
-                local upvalue_name = debug.getupvalue(func, 1)
-                if upvalue_name == "_ENV" then
-                    debug.setupvalue(func, 1, sandbox)
-                end
-            end
-        end
+    elseif type(load) == "function" then
+        func, load_err = load(command, "BetterConsoleCommand", "t", sandbox)
     end
 
     if not func then
@@ -374,7 +350,6 @@ function M.CommandHandler:execute(command_name, context)
         error("Unknown command: " .. tostring(command_name))
     end
 
-    -- Add to history with FIFO eviction
     table.insert(self.history, {
         name = command_name,
         timestamp = os.clock(),

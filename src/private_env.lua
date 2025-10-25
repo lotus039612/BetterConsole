@@ -13,7 +13,6 @@ BetterConsole.Private = Private
 
 Private.module_name = "BetterConsole"
 
--- Windows path separators (FFXIV Minion is Windows-only)
 local path_separator = "\\"
 local alt_separator = "/"
 

@@ -8,6 +8,13 @@ local FiltersConstants = Constants and Constants.Filters
 local FilterStates = FiltersConstants and FiltersConstants.States
 local GeneralConstants = Constants and Constants.General
 
+local L = function(key, ...)
+    if BetterConsole.Localization then
+        return BetterConsole.Localization.get(key, ...)
+    end
+    return key
+end
+
 -- MenuBar module providing top-level menu interface for BetterConsole window
 -- Handles File, Settings, and View menu sections with user preferences
 do
@@ -42,75 +49,75 @@ M.render = function(window)
         return
     end
 
-    if GUI:BeginMenu("File") then
-        if GUI:MenuItem("Export as Text") then
+    if GUI:BeginMenu(L("menu_file")) then
+        if GUI:MenuItem(L("menu_export_text")) then
             window:export_to_clipboard()
         end
         GUI:Separator()
-        if GUI:MenuItem("Save Logs to File") then
+        if GUI:MenuItem(L("menu_save_logs")) then
             window:save_logs_to_file()
         end
         GUI:EndMenu()
     end
 
-    if GUI:BeginMenu("Settings") then
-        local auto_save_logs_label = create_menu_label(window.display.auto_save_logs, "Auto-save Logs")
+    if GUI:BeginMenu(L("menu_settings")) then
+        local auto_save_logs_label = create_menu_label(window.display.auto_save_logs, L("menu_auto_save"))
             if GUI:MenuItem(auto_save_logs_label) then
                 window.display.auto_save_logs = not window.display.auto_save_logs
                 window.export_manager:initialize_auto_save(window.display.auto_save_logs)
                 BetterConsole.Prefs.save_user_prefs(window)
             end
-            TooltipManager.show_warning("Automatically save logs to file on each entry.\n**performance intensive")
+            TooltipManager.show_warning(L("tooltip_auto_save"))
 
             GUI:Separator()
-            local anti_spam_label = create_menu_label(window.anti_spam.enabled, "Anti-Spam Filter")
+            local anti_spam_label = create_menu_label(window.anti_spam.enabled, L("menu_anti_spam"))
             if GUI:MenuItem(anti_spam_label) then
                 window.anti_spam:set_enabled(not window.anti_spam.enabled)
                 BetterConsole.Prefs.save_user_prefs(window)
             end
-            TooltipManager.show_on_hover("Block messages that repeat more than 10 times per second")
+            TooltipManager.show_on_hover(L("tooltip_anti_spam"))
 
             GUI:EndMenu()
         end
 
-        if GUI:BeginMenu("View") then
-            local timestamp_label = create_menu_label(window.display.timestamp, "Timestamp")
+        if GUI:BeginMenu(L("menu_view")) then
+            local timestamp_label = create_menu_label(window.display.timestamp, L("menu_timestamp"))
             if GUI:MenuItem(timestamp_label) then
                 window.display.timestamp = not window.display.timestamp
                 window.state_manager:mark_full_refresh()
                 BetterConsole.Prefs.save_user_prefs(window)
             end
 
-            local level_label = create_menu_label(window.display.level, "Level")
+            local level_label = create_menu_label(window.display.level, L("menu_level"))
             if GUI:MenuItem(level_label) then
                 window.display.level = not window.display.level
                 window.state_manager:mark_full_refresh()
                 BetterConsole.Prefs.save_user_prefs(window)
             end
 
-            local category_label = create_menu_label(window.display.category, "Category")
+            local category_label = create_menu_label(window.display.category, L("menu_category"))
             if GUI:MenuItem(category_label) then
                 window.display.category = not window.display.category
                 window.state_manager:mark_full_refresh()
                 BetterConsole.Prefs.save_user_prefs(window)
             end
 
-            local metadata_label = create_menu_label(window.display.metadata, "Metadata")
+            local metadata_label = create_menu_label(window.display.metadata, L("menu_metadata"))
             if GUI:MenuItem(metadata_label) then
                 window.display.metadata = not window.display.metadata
                 BetterConsole.Prefs.save_user_prefs(window)
             end
 
             GUI:Separator()
-            local metadata_panel_label = create_menu_label(window.show_metadata_panel, "Metadata Panel")
+            local metadata_panel_label = create_menu_label(window.show_metadata_panel, L("menu_metadata_panel"))
             if GUI:MenuItem(metadata_panel_label) then
                 window.show_metadata_panel = not window.show_metadata_panel
                 BetterConsole.Prefs.save_user_prefs(window)
             end
-            TooltipManager.show_on_hover("Show/hide metadata details panel")
+            TooltipManager.show_on_hover(L("tooltip_metadata_panel"))
 
             GUI:Separator()
-            local original_console_label = create_menu_label(BetterConsole.show_original_console, "Show Minion Console")
+            local original_console_label = create_menu_label(BetterConsole.show_original_console, L("menu_show_minion_console"))
             if GUI:MenuItem(original_console_label) then
                 BetterConsole.show_original_console = not BetterConsole.show_original_console
                 if BetterConsole.Init and BetterConsole.Init.set_show_original_console then
@@ -493,10 +500,10 @@ end
 -- @param window table: BetterConsole window instance
 M.render_primary_actions = function(window)
     ensure_dependencies()
-    if GUI:Button("Clear") then
+    if GUI:Button(L("clear_button")) then
         window:clear()
     end
-    TooltipManager.show_on_hover("Clear all console entries")
+    TooltipManager.show_on_hover(L("tooltip_clear"))
 
     GUI:SameLine()
     local preset_names = {}
@@ -507,7 +514,7 @@ M.render_primary_actions = function(window)
     GUI:PushItemWidth(BetterConsole.Models.Constants.UI.LEVEL_DROPDOWN_WIDTH)
     local new_level_index, level_changed = GUI:Combo("##QuickFilter", window.current_quick_filter, preset_names)
     GUI:PopItemWidth()
-    TooltipManager.show_on_hover("Quick level filter presets")
+    TooltipManager.show_on_hover(L("tooltip_quick_filter"))
 
     if level_changed then
         window.current_quick_filter = new_level_index
@@ -632,7 +639,7 @@ M.render_primary_actions = function(window)
 
     GUI:SameLine()
     GUI:SetCursorPosX(search_label_x)
-    GUI:Text("Search:")
+    GUI:Text(L("search_label"))
 
     GUI:SameLine()
     GUI:SetCursorPosX(search_input_x)
@@ -1128,7 +1135,6 @@ M.render = function(window)
         window.command_input = new_text
     end
 
-    -- Use the Keymap module for input shortcuts when focused
     local is_focused = GUI:IsItemFocused()
     if is_focused and BetterConsole.Keymap then
         BetterConsole.Keymap.process_input_shortcuts(is_focused, window)
@@ -1282,11 +1288,11 @@ local function render_selectable_filter(label, is_included, is_excluded, tooltip
 
     if TooltipManager.should_show() then
         if is_excluded then
-            TooltipManager.show(tooltip .. "\nleft-click to include\nright-click to clear exclusion")
+            TooltipManager.show(tooltip .. "\n" .. L("tooltip_filter_left_include") .. "\n" .. L("tooltip_filter_right_clear_exclusion"))
         elseif is_included then
-            TooltipManager.show(tooltip .. "\nleft-click to clear include\nright-click to exclude")
+            TooltipManager.show(tooltip .. "\n" .. L("tooltip_filter_left_clear_include") .. "\n" .. L("tooltip_filter_right_exclude"))
         else
-            TooltipManager.show(tooltip .. "\nleft-click to include\nright-click to exclude")
+            TooltipManager.show(tooltip .. "\n" .. L("tooltip_filter_left_include") .. "\n" .. L("tooltip_filter_right_exclude"))
         end
     end
 
@@ -1364,7 +1370,7 @@ M.render = function(window)
         return
     end
 
-    local visible, open = GUI:Begin("Advanced Filter Configuration##FilterWindow", window.filter_window_open, GUI.WindowFlags_AlwaysAutoResize)
+    local visible, open = GUI:Begin(L("filter_window_title"), window.filter_window_open, GUI.WindowFlags_AlwaysAutoResize)
 
     if not open then
         window.filter_window_open = false
@@ -1379,24 +1385,24 @@ M.render = function(window)
 
         local display_count = #window.display_entries
         local total_count = window.data_store:get_entry_count()
-        GUI:TextColored(0, 1, 1, 1, string.format("Showing %d of %d entries", display_count, total_count))
+        GUI:TextColored(0, 1, 1, 1, L("showing_entries", display_count, total_count))
         GUI:Separator()
 
-        if GUI:CollapsingHeader("Search Options") then
-            local case_value, case_changed = GUI:Checkbox("Case Sensitive", window.search.case_sensitive)
+        if GUI:CollapsingHeader(L("search_options")) then
+            local case_value, case_changed = GUI:Checkbox(L("case_sensitive"), window.search.case_sensitive)
             if case_changed then
                 window.search.case_sensitive = case_value
                 on_any_filter_changed(window)
             end
-            TooltipManager.show_on_hover("Match exact letter case in searches")
+            TooltipManager.show_on_hover(L("tooltip_case_sensitive"))
 
             GUI:Spacing()
-            GUI:Text("Active Search Term:")
+            GUI:Text(L("active_search_term"))
 
             local has_search = window.filters.search and window.filters.search ~= ""
 
             if not has_search then
-                GUI:TextDisabled("No active search terms")
+                GUI:TextDisabled(L("no_active_search"))
             else
 
                 if Theme.colored_button(
@@ -1411,14 +1417,14 @@ M.render = function(window)
                     on_any_filter_changed(window)
                 end
 
-                TooltipManager.show_on_hover("Click to remove search phrase: " .. window.filters.search)
+                TooltipManager.show_on_hover(L("tooltip_remove_search", window.filters.search))
             end
         end
 
         GUI:Separator()
 
-        if GUI:CollapsingHeader("Log Levels") then
-            if GUI:SmallButton("Clear##Levels") then
+        if GUI:CollapsingHeader(L("log_levels")) then
+            if GUI:SmallButton(L("filter_clear") .. "##Levels") then
                 for _, level in ipairs(BetterConsole.Models.LogLevel.ALL_LEVELS) do
                     window.filters.level_states[level.name] = 0
                 end
@@ -1426,10 +1432,10 @@ M.render = function(window)
                 on_any_filter_changed(window)
                 window:update_quick_filter_from_levels()
             end
-            TooltipManager.show_on_hover("Clear all level filters")
+            TooltipManager.show_on_hover(L("tooltip_clear_levels"))
 
             GUI:SameLine()
-            if GUI:SmallButton("Invert##Levels") then
+            if GUI:SmallButton(L("filter_invert") .. "##Levels") then
                 for _, level in ipairs(BetterConsole.Models.LogLevel.ALL_LEVELS) do
                     local current = window.filters.level_states[level.name] or 0
                     if current == 1 then
@@ -1442,7 +1448,7 @@ M.render = function(window)
                 on_any_filter_changed(window)
                 window:update_quick_filter_from_levels()
             end
-            TooltipManager.show_on_hover("Swap included/excluded levels")
+            TooltipManager.show_on_hover(L("tooltip_invert_levels"))
 
             GUI:Spacing()
 
@@ -1464,24 +1470,24 @@ M.render = function(window)
 
             local tooltips = {
                 TRACE = {
-                    include = "Show detailed trace messages for debugging",
-                    exclude = "Hide trace messages"
+                    include = L("tooltip_level_trace"),
+                    exclude = L("tooltip_hide_trace")
                 },
                 DEBUG = {
-                    include = "Show debug information for development",
-                    exclude = "Hide debug messages"
+                    include = L("tooltip_level_debug"),
+                    exclude = L("tooltip_hide_debug")
                 },
                 INFO = {
-                    include = "Show informational messages",
-                    exclude = "Hide informational messages"
+                    include = L("tooltip_level_info"),
+                    exclude = L("tooltip_hide_info")
                 },
                 WARN = {
-                    include = "Show warning messages",
-                    exclude = "Hide warning messages"
+                    include = L("tooltip_level_warn"),
+                    exclude = L("tooltip_hide_warn")
                 },
                 ERROR = {
-                    include = "Show error messages",
-                    exclude = "Hide error messages"
+                    include = L("tooltip_level_error"),
+                    exclude = L("tooltip_hide_error")
                 }
             }
 
@@ -1522,7 +1528,7 @@ M.render = function(window)
 
         GUI:Separator()
 
-        if GUI:CollapsingHeader("Categories") then
+        if GUI:CollapsingHeader(L("categories")) then
             local categories = window:get_available_categories()
             local num_categories = 0
             for _, cat in ipairs(categories) do
@@ -1532,9 +1538,9 @@ M.render = function(window)
             end
 
             if num_categories == 0 then
-                GUI:TextDisabled("No categories available")
+                GUI:TextDisabled(L("no_categories_available"))
             else
-                if GUI:SmallButton("Clear##Categories") then
+                if GUI:SmallButton(L("filter_clear") .. "##Categories") then
                     for _, cat in ipairs(categories) do
                         if cat ~= "All" then
                             window.filters.category_states[cat] = 0
@@ -1543,10 +1549,10 @@ M.render = function(window)
                     sync_category_maps_from_states(window, categories)
                     on_any_filter_changed(window)
                 end
-                TooltipManager.show_on_hover("Clear all category filters")
+                TooltipManager.show_on_hover(L("tooltip_clear_categories"))
 
                 GUI:SameLine()
-                if GUI:SmallButton("Invert##Categories") then
+                if GUI:SmallButton(L("filter_invert") .. "##Categories") then
                     for _, cat in ipairs(categories) do
                         if cat ~= "All" then
                             local current = window.filters.category_states[cat] or 0
@@ -1560,7 +1566,7 @@ M.render = function(window)
                     sync_category_maps_from_states(window, categories)
                     on_any_filter_changed(window)
                 end
-                TooltipManager.show_on_hover("Swap included/excluded categories")
+                TooltipManager.show_on_hover(L("tooltip_invert_categories"))
 
                 GUI:Spacing()
 
@@ -1571,7 +1577,7 @@ M.render = function(window)
                     window.category_search_text = new_search
                 end
                 GUI:PopItemWidth()
-                TooltipManager.show_on_hover("Filter categories by name")
+                TooltipManager.show_on_hover(L("tooltip_category_search"))
 
                 GUI:Spacing()
             end
@@ -1595,7 +1601,7 @@ M.render = function(window)
                             local current_state = window.filters.category_states[cat] or 0
                             local is_included = current_state == 1
                             local is_excluded = current_state == 2
-                            local tooltip_text = is_excluded and ("Hide " .. cat .. " category messages") or ("Show " .. cat .. " category messages")
+                            local tooltip_text = is_excluded and L("tooltip_hide_category_messages", cat) or L("tooltip_show_category_messages", cat)
 
                             local left_clicked, right_clicked = render_selectable_filter(cat, is_included, is_excluded, tooltip_text)
 
@@ -1626,7 +1632,7 @@ M.render = function(window)
 
         GUI:Separator()
 
-        if GUI:Button("Clear Filters", 100, 0) then
+        if GUI:Button(L("filter_clear_all"), 100, 0) then
             window:clear_all_filters()
 
             ensure_filter_tables(window)
@@ -1637,7 +1643,7 @@ M.render = function(window)
             window:update_quick_filter_from_levels()
         end
         GUI:SameLine()
-        if GUI:Button("Close", 100, 0) then
+        if GUI:Button(L("filter_close"), 100, 0) then
             window.filter_window_open = false
         end
 
@@ -1801,11 +1807,9 @@ local function render_value_colored(value, indent, visited, depth, max_depth)
                 items[#items + 1] = { key = k, value = v }
             end
 
-            -- Sort items for consistent display order
             table.sort(items, function(a, b)
                 local ta, tb = type(a.key), type(b.key)
                 if ta ~= tb then
-                    -- Numbers before strings before other types
                     if ta == "number" then return true end
                     if tb == "number" then return false end
                     if ta == "string" then return true end
@@ -1965,7 +1969,6 @@ M.render = function(window, width, height)
                 text_colored({ 0.7, 0.7, 0.7, 1.0 }, "Metadata:")
                 GUI:Spacing()
 
-                -- Collect and sort keys for consistent display order
                 local sorted_keys = {}
                 for k in pairs(entry.data) do
                     sorted_keys[#sorted_keys + 1] = k
@@ -1973,7 +1976,6 @@ M.render = function(window, width, height)
                 table.sort(sorted_keys, function(a, b)
                     local ta, tb = type(a), type(b)
                     if ta ~= tb then
-                        -- Numbers before strings before other types
                         if ta == "number" then return true end
                         if tb == "number" then return false end
                         if ta == "string" then return true end

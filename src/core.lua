@@ -1,16 +1,12 @@
--- Core module containing essential system components
--- Includes error handling, validation, models, filtering, state management, and data storage
 local Core = {}
 
 if not BetterConsole then
     BetterConsole = {}
 end
 
--- ErrorTypes module defining error categories, severities, and error creation
 do
 local M = {}
 
--- Error category constants for classification
 M.Category = {
     VALIDATION = "ValidationError",
     IO = "IOError",
@@ -23,21 +19,18 @@ M.Category = {
     UNKNOWN = "UnknownError"
 }
 
--- Severity level constants for error importance
 M.Severity = {
     WARNING = 1,
     ERROR = 2,
     FATAL = 3
 }
 
--- Maps severity levels to log level names
 M.SeverityToLogLevel = {
     [1] = "WARN",
     [2] = "ERROR",
     [3] = "ERROR"
 }
 
--- Default severity levels for each error category
 M.CategorySeverity = {
     ValidationError = M.Severity.WARNING,
     IOError = M.Severity.ERROR,
@@ -88,7 +81,6 @@ BetterConsole.ErrorTypes = M
 Core.ErrorTypes = M
 end
 
--- ErrorHandler module providing error handling, logging, and reporting
 do
 local M = {}
 
@@ -195,11 +187,9 @@ BetterConsole.ErrorHandler = M
 Core.ErrorHandler = M
 end
 
--- ValidationRules module defining validation constraints and error messages
 do
 local M = {}
 
--- Valid log level names
 M.VALID_LOG_LEVELS = {
     TRACE = true,
     DEBUG = true,
@@ -208,19 +198,15 @@ M.VALID_LOG_LEVELS = {
     ERROR = true
 }
 
--- Maximum length constraints for various inputs
 M.MAX_CATEGORY_LENGTH = 100
 M.MAX_MESSAGE_LENGTH = 10000
 M.MAX_PRESET_NAME_LENGTH = 50
 M.MAX_FILENAME_LENGTH = 255
 M.MAX_COMMAND_LENGTH = 10000
-
--- Minimum length constraints
 M.MIN_CATEGORY_LENGTH = 1
 M.MIN_MESSAGE_LENGTH = 0
 M.MIN_PRESET_NAME_LENGTH = 1
 
--- Error message templates for validation failures
 M.ERROR_MESSAGES = {
     LEVEL_REQUIRED = "Log level is required",
     LEVEL_INVALID_TYPE = "Log level must be a string",
@@ -255,7 +241,6 @@ BetterConsole.ValidationRules = M
 Core.ValidationRules = M
 end
 
--- Validators module providing input validation functions
 do
 local M = {}
 
@@ -473,11 +458,9 @@ BetterConsole.Validators = M
 Core.Validators = M
 end
 
--- Models module defining constants, log levels, and log entry objects
 do
 local M = {}
 
--- Application-wide constants for configuration
 M.Constants = {
     Time = {
         MS_PER_SECOND = 1000
@@ -556,7 +539,6 @@ M.Constants = {
     }
 }
 
--- Log level definitions with values, names, prefixes, and colors
 M.LogLevel = {}
 
 M.LogLevel.TRACE = {
@@ -594,7 +576,6 @@ M.LogLevel.ERROR = {
     color = { 1.0, 0.3, 0.3, 1.0 }
 }
 
--- Array of all log levels in order
 M.LogLevel.ALL_LEVELS = {
     M.LogLevel.TRACE,
     M.LogLevel.DEBUG,
@@ -603,7 +584,6 @@ M.LogLevel.ALL_LEVELS = {
     M.LogLevel.ERROR
 }
 
--- Maps level names and numeric values to level objects
 M.LogLevel.LEVEL_MAP = {
     ["TRACE"] = M.LogLevel.TRACE,
     ["DEBUG"] = M.LogLevel.DEBUG,
@@ -762,7 +742,6 @@ BetterConsole.Models = M
 Core.Models = M
 end
 
--- TextUtils module providing text truncation utilities for display
 do
 local M = {}
 local Constants = BetterConsole.Models.Constants
@@ -818,7 +797,6 @@ BetterConsole.TextUtils = M
 Core.TextUtils = M
 end
 
--- Search module providing optimized text search and highlighting utilities
 do
 local M = {}
 
@@ -984,7 +962,6 @@ BetterConsole.Search = M
 Core.Search = M
 end
 
--- FilterEvaluator module providing filter evaluation and state management
 do
 local M = {}
 
@@ -1125,7 +1102,6 @@ BetterConsole.FilterEvaluator = M
 Core.FilterEvaluator = M
 end
 
--- Filters module providing filtering operations with chunked processing support
 do
 local M = {}
 
@@ -1374,11 +1350,9 @@ BetterConsole.Filters = M
 Core.Filters = M
 end
 
--- StateManager module for tracking dirty state and triggering refreshes
 do
 local M = {}
 
--- State constants for tracking what needs to be refreshed
 M.State = {
     CLEAN = 0,
     ENTRIES_DIRTY = 1,
@@ -1516,7 +1490,6 @@ BetterConsole.StateManager = M
 Core.StateManager = M
 end
 
--- SpamBlocker module providing intelligent spam detection and blocking
 do
 local M = {}
 
@@ -1693,7 +1666,6 @@ function M:generate_message_hash(message, category)
     return tostring(hash)
 end
 
--- Cleans up expired patterns and manages memory usage
 function M:cleanup_expired_patterns()
     local current_time = now_ms()
 
@@ -2057,7 +2029,6 @@ BetterConsole.RepositoryInterface = M
 Core.RepositoryInterface = M
 end
 
--- Store module providing high-level log entry storage with validation
 do
 local M = {}
 

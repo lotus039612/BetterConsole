@@ -41,6 +41,14 @@ local Intercept = BetterConsole.Intercept
 local App = BetterConsole.App
 local Private = BetterConsole.Private
 
+-- Localization
+local L = function(key, ...)
+    if BetterConsole.Localization then
+        return BetterConsole.Localization.get(key, ...)
+    end
+    return key
+end
+
 -- Initialize show_original_console flag (controls whether native console is shown)
 if BetterConsole.show_original_console == nil then
     BetterConsole.show_original_console = false
@@ -256,7 +264,7 @@ function M.initialize()
     Intercept.initialize(M.console)
 
     if M.console and M.console.add_entry then
-        M.console:add_entry("INFO", "Console", "BetterConsole initialized - capturing all log messages")
+        M.console:add_entry("INFO", "Console", L("notify_initialized"))
     end
 end
 
@@ -311,6 +319,68 @@ end
 
 -- Export the Init module
 BetterConsole.Init = M
+
+-- ============================================================================
+-- Stress Test Utilities
+-- ============================================================================
+
+--- Stress tests the console by adding many log entries
+-- Generates entries with varying levels, categories, and message lengths
+-- @param count number Number of entries to generate (default 100)
+function _G.stresstest(count)
+    count = count or 100
+
+    local levels = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR"}
+    local categories = {"Combat", "Navigation", "AI", "Skills", "Inventory", "Quest", "System", "Network", "Database"}
+
+    local messages = {
+        "Short message",
+        "This is a medium length message that might wrap to multiple lines depending on window width",
+        "This is a very long message with lots of details that will definitely wrap to multiple lines. It contains information about various systems, states, and debug data that would be typical in a real console log. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "Processing data...",
+        "Action completed successfully",
+        "Warning: unusual state detected",
+        "Error occurred during operation",
+        "Debug info: variable_x = 123, variable_y = 456",
+        "Player position updated: X=100.5, Y=200.3, Z=50.7",
+        "Target acquired: Entity[1234] Distance[15.2m]",
+        "Skill cooldown: 2.5 seconds remaining",
+        "Item obtained: [Potion of Healing] x5",
+        "Quest objective completed: Defeat 10 enemies (10/10)",
+        "Network latency: 45ms | Packet loss: 0.2%",
+        "Memory usage: 145.3 MB | Cache size: 2048 entries"
+    }
+
+    d(string.format("[StressTest] Generating %d console entries...", count))
+
+    for i = 1, count do
+        local level = levels[math.random(1, #levels)]
+        local category = categories[math.random(1, #categories)]
+        local message = messages[math.random(1, #messages)]
+
+        -- Add entry number to make each unique
+        local full_message = string.format("[Entry %d/%d] %s", i, count, message)
+
+        -- Every 5th entry gets metadata
+        local metadata = nil
+        if i % 5 == 0 then
+            metadata = {
+                entry_id = i,
+                timestamp = os.time(),
+                random_value = math.random(1, 1000),
+                nested_data = {
+                    foo = "bar",
+                    count = i,
+                    enabled = (i % 2 == 0)
+                }
+            }
+        end
+
+        M.addEntry(level, category, full_message, metadata)
+    end
+
+    d(string.format("[StressTest] Completed! Added %d entries to console", count))
+end
 
 -- ============================================================================
 -- Event Handlers Module

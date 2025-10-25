@@ -5,7 +5,6 @@ local Constants = Models and Models.Constants
 local TimeConstants = Constants and Constants.Time
 local CategoryConstants = Constants and Constants.Categories
 
--- RingBuffer module providing fixed-size circular buffer with automatic wrapping
 do
 local M = {}
 
@@ -190,7 +189,6 @@ BetterConsole.LRU = M
     Infrastructure.LRU = M
 end
 
--- Scheduler module providing coroutine-based task management and chunked processing
 do
 local M = {}
 

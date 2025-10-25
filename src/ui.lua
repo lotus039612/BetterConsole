@@ -26,6 +26,14 @@ local FiltersConstants = Constants and Constants.Filters
 local FilterStates = FiltersConstants and FiltersConstants.States
 local GeneralConstants = Constants and Constants.General
 
+-- Localization
+local L = function(key, ...)
+    if BetterConsole.Localization then
+        return BetterConsole.Localization.get(key, ...)
+    end
+    return key
+end
+
 -- Module-level constants
 local INITIAL_TIME = 0
 local INITIAL_INDEX = (GeneralConstants and GeneralConstants.FIRST_INDEX) or 1
@@ -94,10 +102,10 @@ local KEY_ESCAPE = 27
 local FILTER_SAVE_DELAY_MS = 200
 
 -- Layout constants
-local METADATA_DEFAULT_RATIO = 0.30  -- Default width ratio for metadata panel
-local LAYOUT_SPACING = 4             -- Spacing between layout elements
-local RESERVED_HEIGHT = 55           -- Height reserved for command input and status bar
-local MIN_PANEL_HEIGHT = 100         -- Minimum height for panels
+local METADATA_DEFAULT_RATIO = 0.30
+local LAYOUT_SPACING = 4
+local RESERVED_HEIGHT = 55
+local MIN_PANEL_HEIGHT = 100
 
 --- Renders the main window chrome and handles window lifecycle
 -- Sets window constraints, manages collapsed state, and executes the main render callback
@@ -301,7 +309,7 @@ local M = {}
 local FilterEvaluator = BetterConsole.FilterEvaluator
 
 local PRESET_MIN_INDEX = 1
-local NOTIFICATION_DURATION = 3  -- Seconds to show notifications
+local NOTIFICATION_DURATION = 3
 
 --- Updates display entries by processing filtering and search operations
 -- Main update loop that handles coroutines, chunked filtering, and incremental updates
@@ -1130,23 +1138,23 @@ local M = {}
 -- Color definitions (RGBA format with values 0.0-1.0)
 M.Colors = {
     -- Text colors
-    TEXT_DEFAULT = { 1.0, 1.0, 1.0, 1.0 },    -- White
-    TEXT_WARNING = { 1.0, 1.0, 0.0, 1.0 },    -- Yellow
+    TEXT_DEFAULT = { 1.0, 1.0, 1.0, 1.0 },
+    TEXT_WARNING = { 1.0, 1.0, 0.0, 1.0 },
 
     -- Secondary button colors
-    BUTTON_SECONDARY = { 0.15, 0.15, 0.15, 1.0 },        -- Dark gray
-    BUTTON_SECONDARY_HOVER = { 0.25, 0.25, 0.25, 1.0 },  -- Medium gray
-    BUTTON_SECONDARY_ACTIVE = { 0.35, 0.35, 0.35, 1.0 }, -- Light gray
+    BUTTON_SECONDARY = { 0.15, 0.15, 0.15, 1.0 },
+    BUTTON_SECONDARY_HOVER = { 0.25, 0.25, 0.25, 1.0 },
+    BUTTON_SECONDARY_ACTIVE = { 0.35, 0.35, 0.35, 1.0 },
 
     -- Filter chip colors
-    CHIP_SEARCH = { 0.2, 0.6, 0.8, 1.0 },         -- Blue (search filters)
-    CHIP_SEARCH_ALT = { 0.2, 0.4, 0.8, 1.0 },     -- Darker blue
-    CHIP_SEARCH_HOVER = { 0.3, 0.5, 0.9, 1.0 },   -- Bright blue
-    CHIP_SEARCH_ACTIVE = { 0.15, 0.35, 0.7, 1.0 },-- Dark blue
-    CHIP_LEVEL = { 0.3, 0.6, 0.9, 1.0 },          -- Light blue (level filters)
-    CHIP_CATEGORY = { 0.3, 0.7, 0.5, 1.0 },       -- Teal (category filters)
-    CHIP_EXCLUDE = { 0.8, 0.3, 0.3, 1.0 },        -- Red (exclude filters)
-    CHIP_EXCLUDE_TEXT = { 0.9, 0.3, 0.3, 1.0 },   -- Bright red (exclude text)
+    CHIP_SEARCH = { 0.2, 0.6, 0.8, 1.0 },
+    CHIP_SEARCH_ALT = { 0.2, 0.4, 0.8, 1.0 },
+    CHIP_SEARCH_HOVER = { 0.3, 0.5, 0.9, 1.0 },
+    CHIP_SEARCH_ACTIVE = { 0.15, 0.35, 0.7, 1.0 },
+    CHIP_LEVEL = { 0.3, 0.6, 0.9, 1.0 },
+    CHIP_CATEGORY = { 0.3, 0.7, 0.5, 1.0 },
+    CHIP_EXCLUDE = { 0.8, 0.3, 0.3, 1.0 },
+    CHIP_EXCLUDE_TEXT = { 0.9, 0.3, 0.3, 1.0 },
 }
 
 -- Style constants for layout and sizing
@@ -1277,11 +1285,11 @@ do
 local M = {}
 
 -- Virtual scroll configuration constants
-local INITIAL_VISIBLE_END = 30       -- Initial number of visible items
-local AUTO_SCROLL_THRESHOLD = 50     -- Pixels from bottom to trigger auto-scroll
-local ESTIMATED_HEIGHT_MULTIPLIER = 2 -- Multiplier for spacer height estimation
-local BOTTOM_SPACER_HEIGHT = 5       -- Extra spacer at bottom for padding
-local SCROLL_TOLERANCE = 1           -- Minimum scroll distance to trigger update
+local INITIAL_VISIBLE_END = 30
+local AUTO_SCROLL_THRESHOLD = 50
+local ESTIMATED_HEIGHT_MULTIPLIER = 2
+local BOTTOM_SPACER_HEIGHT = 5
+local SCROLL_TOLERANCE = 1
 
 --- Creates a new virtual scroll state object
 -- @return table New virtual scroll state with default values
@@ -1420,7 +1428,7 @@ end
 function M.render_spacers_with_ranges(window, actual_visible_start, render_start, render_end, total_entries)
     local item_height = window.virtual_scroll.item_height
 
-    local estimated_item_height = item_height * ESTIMATED_HEIGHT_MULTIPLIER
+    local estimated_item_height = item_height
 
     local top_spacer_start = math.min(actual_visible_start, render_start)
     if top_spacer_start > INITIAL_INDEX then

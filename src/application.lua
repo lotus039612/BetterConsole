@@ -1,6 +1,12 @@
--- Application module providing main console window functionality
--- Contains the ConsoleWindow class with rendering, filtering, searching, and command execution
 local Application = {}
+
+-- Localization
+local L = function(key, ...)
+    if BetterConsole.Localization then
+        return BetterConsole.Localization.get(key, ...)
+    end
+    return key
+end
 
 do
 local M = {}
@@ -220,11 +226,11 @@ function M.new()
         current_quick_filter = 1,
         current_category_filter = 1,
         quick_filter_presets = {
-            { name = "All Levels",  levels = { TRACE = true, DEBUG = true, INFO = true, WARN = true, ERROR = true } },
-            { name = "Errors Only", levels = { TRACE = false, DEBUG = false, INFO = false, WARN = false, ERROR = true } },
-            { name = "Warnings+",   levels = { TRACE = false, DEBUG = false, INFO = false, WARN = true, ERROR = true } },
-            { name = "Info+",       levels = { TRACE = false, DEBUG = false, INFO = true, WARN = true, ERROR = true } },
-            { name = "Debug+",      levels = { TRACE = false, DEBUG = true, INFO = true, WARN = true, ERROR = true } }
+            { name = L("preset_all_levels"),  levels = { TRACE = true, DEBUG = true, INFO = true, WARN = true, ERROR = true } },
+            { name = L("preset_errors_only"), levels = { TRACE = false, DEBUG = false, INFO = false, WARN = false, ERROR = true } },
+            { name = L("preset_warnings_plus"),   levels = { TRACE = false, DEBUG = false, INFO = false, WARN = true, ERROR = true } },
+            { name = L("preset_info_plus"),       levels = { TRACE = false, DEBUG = false, INFO = true, WARN = true, ERROR = true } },
+            { name = L("preset_debug_plus"),      levels = { TRACE = false, DEBUG = true, INFO = true, WARN = true, ERROR = true } }
         },
 
         custom_filter_presets = {},
@@ -1084,7 +1090,7 @@ function M.ConsoleWindow:sanitize_clipboard_text(text)
     local Constants = BetterConsole.Models.Constants
     local sanitized = text
 
-    sanitized = string.gsub(sanitized, "[\0-\8\11-\31\127]", "")
+    sanitized = sanitized:gsub("[%z\1-\8\11-\31\127]", "")
 
     if #sanitized > Constants.Clipboard.MAX_CLIPBOARD_LENGTH then
         sanitized = string.sub(sanitized, 1, Constants.Clipboard.MAX_CLIPBOARD_LENGTH)
